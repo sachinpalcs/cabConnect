@@ -1,0 +1,11 @@
+package com.project.uber.uberweb.exceptions;
+
+public class RuntimeConflictException extends RuntimeException {
+
+    public RuntimeConflictException() {
+    }
+
+    public RuntimeConflictException(String message) {
+        super(message);
+    }
+}
