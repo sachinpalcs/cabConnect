@@ -1,8 +1,6 @@
 package com.project.uber.uberweb.services.impl;
 
-import com.project.uber.uberweb.dto.DriverDto;
-import com.project.uber.uberweb.dto.RideDto;
-import com.project.uber.uberweb.dto.RiderDto;
+import com.project.uber.uberweb.dto.*;
 import com.project.uber.uberweb.entities.Driver;
 import com.project.uber.uberweb.entities.Ride;
 import com.project.uber.uberweb.entities.RideRequest;
@@ -13,6 +11,7 @@ import com.project.uber.uberweb.exceptions.ResourceNotFoundException;
 import com.project.uber.uberweb.repositories.DriverRepository;
 import com.project.uber.uberweb.services.*;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Point;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +52,10 @@ public class DriverServiceImpl implements DriverService {
         }
 
         Driver savedDriver = updateDriverAvailability(currentDriver, false);
+
+        // ADD FOR DRIVER MATCH
+        rideRequest.setRideRequestStatues(RideRequestStatues.CONFIRMED);
+        rideRequest.getPotentialDrivers().clear();
 
         Ride ride = rideService.createNewRide(rideRequest, savedDriver);
         return modelMapper.map(ride, RideDto.class);
@@ -176,5 +181,35 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public Driver createNewDriver(Driver driver) {
         return driverRepository.save(driver);
+    }
+
+    @Override
+    @Transactional
+    public DriverDto updateAvailability(Boolean available) {
+        Driver currentDriver = getCurrentDriver();
+        currentDriver.setAvailable(available);
+        Driver savedDriver = driverRepository.save(currentDriver);
+        return modelMapper.map(savedDriver, DriverDto.class);
+    }
+
+    @Override
+    @Transactional
+    public DriverDto updateLocation(DriverLocationDto locationDto) {
+        Driver currentDriver = getCurrentDriver();
+        Point point = modelMapper.map(locationDto.getCurrentLocation(), Point.class);
+        currentDriver.setCurrentLocation(point);
+        Driver savedDriver = driverRepository.save(currentDriver);
+        return modelMapper.map(savedDriver, DriverDto.class);
+    }
+
+
+    // Add other necessary methods as needed
+    @Override
+    public List<RideRequestDto> getPendingRequests() {
+        Driver currentDriver = getCurrentDriver();
+        List<RideRequest> rideRequests = driverRepository.findPendingRideRequestsForDriver(currentDriver.getId(), "PENDING");
+        return rideRequests.stream()
+                .map(rideRequest -> modelMapper.map(rideRequest, RideRequestDto.class))
+                .collect(Collectors.toList());
     }
 }

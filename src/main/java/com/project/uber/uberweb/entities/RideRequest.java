@@ -10,6 +10,7 @@ import org.locationtech.jts.geom.Point;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -44,4 +45,13 @@ public class RideRequest {
     private RideRequestStatues rideRequestStatues;
 
     private BigDecimal fare;
+
+    // ADD other necessary fields and relationships as needed
+    @ManyToMany
+    @JoinTable(
+            name = "ride_request_potential_drivers",
+            joinColumns = @JoinColumn(name = "ride_request_id"),
+            inverseJoinColumns = @JoinColumn(name = "driver_id")
+    )
+    private List<Driver> potentialDrivers;
 }

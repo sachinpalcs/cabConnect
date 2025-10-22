@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.awt.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -25,7 +26,7 @@ public class RideRequestDto {
 
     private RiderDto rider;
 
-    private Double fare;
+    private BigDecimal fare;
     private PaymentMethod paymentMethod;
     private RideRequestStatues rideRequestStatues;
 }

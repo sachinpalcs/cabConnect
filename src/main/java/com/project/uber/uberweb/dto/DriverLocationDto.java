@@ -1,21 +1,14 @@
 package com.project.uber.uberweb.dto;
 
-
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DriverDto {
+public class DriverLocationDto {
 
-    private Long id;
-    private UserDto user;
-    private BigDecimal rating;
-    private Boolean available;
-    private String vehicleId;
     private PointDto currentLocation;
 }

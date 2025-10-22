@@ -1,14 +1,13 @@
 package com.project.uber.uberweb.services;
 
-import com.project.uber.uberweb.dto.DriverDto;
-import com.project.uber.uberweb.dto.RideDto;
-import com.project.uber.uberweb.dto.RiderDto;
+import com.project.uber.uberweb.dto.*;
 import com.project.uber.uberweb.entities.Driver;
 import com.project.uber.uberweb.entities.Rider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface DriverService {
 
@@ -32,4 +31,11 @@ public interface DriverService {
     Driver updateDriverAvailability(Driver driver, boolean available);
 
     Driver createNewDriver(Driver driver);
+
+    DriverDto updateAvailability(Boolean available);
+
+    DriverDto updateLocation(DriverLocationDto locationDto);
+
+    // ADD FOR OTHER NECESSARY METHODS
+    List<RideRequestDto> getPendingRequests();
 }

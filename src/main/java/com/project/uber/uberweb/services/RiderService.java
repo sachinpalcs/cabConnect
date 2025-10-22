@@ -9,6 +9,7 @@ import com.project.uber.uberweb.entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface RiderService {
@@ -17,8 +18,13 @@ public interface RiderService {
 
     RideDto cancelRide(Long rideId);
 
+    // ADD FOR RIDE REQUEST CANCELLATION IF NEEDED
+    RideRequestDto cancelRideRequest(Long rideRequestId);
 
-    DriverDto rateDriver(Long rideId, Integer rating);
+
+    DriverDto rateDriver(Long rideId, BigDecimal rating);
+
+    RideDto getRideDetails(Long rideId);
 
     RiderDto getMyProfile();
 

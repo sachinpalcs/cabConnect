@@ -10,10 +10,7 @@ import com.project.uber.uberweb.entities.enums.RideStatues;
 import com.project.uber.uberweb.exceptions.ResourceNotFoundException;
 import com.project.uber.uberweb.repositories.RideRequestRepository;
 import com.project.uber.uberweb.repositories.RiderRepository;
-import com.project.uber.uberweb.services.DriverService;
-import com.project.uber.uberweb.services.RatingService;
-import com.project.uber.uberweb.services.RideService;
-import com.project.uber.uberweb.services.RiderService;
+import com.project.uber.uberweb.services.*;
 import com.project.uber.uberweb.strategies.RideStrategyManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +36,7 @@ public class RiderServiceImpl implements RiderService {
     private final RideService rideService;
     private final DriverService driverService;
     private final RatingService ratingService;
+    private final RideRequestService rideRequestService;
 
     @Override
     @Transactional
@@ -49,14 +47,21 @@ public class RiderServiceImpl implements RiderService {
         rideRequest.setRideRequestStatues(RideRequestStatues.PENDING);
         rideRequest.setRider(rider);
 
-        Double fare = rideStrategyManager.rideFareCalculationStrategy().calculateFare(rideRequest);
-        rideRequest.setFare(BigDecimal.valueOf(fare));
+        BigDecimal fare = rideStrategyManager.rideFareCalculationStrategy().calculateFare(rideRequest);
+        rideRequest.setFare(fare);
 
         RideRequest savedRideRequest = rideRequestRepository.save(rideRequest);
 
         List<Driver> drivers = rideStrategyManager
                 .driverMatchingStrategy(rider.getRating()).findMatchingDriver(rideRequest);
-        return modelMapper.map(savedRideRequest, RideRequestDto.class);
+
+        //ADD FOR DRIVER MATCH
+        savedRideRequest.setPotentialDrivers(drivers);
+        RideRequest updatedRideRequest = rideRequestRepository.save(savedRideRequest);
+        return modelMapper.map(updatedRideRequest, RideRequestDto.class);
+
+
+//        return modelMapper.map(savedRideRequest, RideRequestDto.class);
     }
 
 
@@ -76,11 +81,31 @@ public class RiderServiceImpl implements RiderService {
         Ride savedRide = rideService.updateRideStatus(ride, RideStatues.CANCELLED);
         driverService.updateDriverAvailability(ride.getDriver(), true);
 
+        // ADD OR DRIVER MATCH
+//        rideRequest.getPotentialDrivers().clear();
+
         return modelMapper.map(savedRide, RideDto.class);
     }
 
     @Override
-    public DriverDto rateDriver(Long rideId, Integer rating) {
+    public RideRequestDto cancelRideRequest(Long rideRequestId) {
+        RideRequest rideRequest = rideRequestService.findRideRequestById(rideRequestId);
+        if (rideRequest.getRideRequestStatues().equals(RideRequestStatues.CANCELLED)) {
+            throw new RuntimeException("RideRequest is already cancelled, status is " + rideRequest.getRideRequestStatues());
+        }
+
+        if (rideRequest.getRideRequestStatues().equals(RideRequestStatues.CONFIRMED)) {
+            throw new RuntimeException("RideRequest is confirmed, It can cancel by cancelRide status is " + rideRequest.getRideRequestStatues());
+        }
+
+        rideRequest.setRideRequestStatues(RideRequestStatues.CANCELLED);
+        rideRequest.getPotentialDrivers().clear();
+        RideRequest savedRideRequest = rideRequestRepository.save(rideRequest);
+        return modelMapper.map(savedRideRequest, RideRequestDto.class);
+    }
+
+    @Override
+    public DriverDto rateDriver(Long rideId, BigDecimal rating) {
         Ride ride = rideService.getRideById(rideId);
         Rider rider = getCurrentRider();
 
@@ -93,6 +118,18 @@ public class RiderServiceImpl implements RiderService {
         }
 
         return ratingService.rateDriver(ride, rating);
+    }
+
+    @Override
+    public RideDto getRideDetails(Long rideId) {
+        Rider rider = getCurrentRider();
+        Ride ride = rideService.getRideById(rideId);
+
+        if (!rider.getId().equals(ride.getRider().getId())) {
+            throw new RuntimeException("Rider is not the owner of this Ride");
+        }
+
+        return modelMapper.map(ride, RideDto.class);
     }
 
     @Override

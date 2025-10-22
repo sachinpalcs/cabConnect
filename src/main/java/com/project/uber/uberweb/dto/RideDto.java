@@ -4,6 +4,7 @@ import com.project.uber.uberweb.entities.enums.PaymentMethod;
 import com.project.uber.uberweb.entities.enums.RideStatues;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
@@ -24,7 +25,7 @@ public class RideDto {
 
     private String otp;
 
-    private Double fare;
+    private BigDecimal fare;
     private LocalDateTime startedAt;
     private LocalDateTime endedAt;
 }

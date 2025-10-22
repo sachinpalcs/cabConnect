@@ -3,6 +3,7 @@ package com.project.uber.uberweb.dto;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -12,7 +13,7 @@ public class WalletDto {
 
     private UserDto user;
 
-    private Double balance;
+    private BigDecimal balance;
 
     private List<WalletTransactionDto> transactions;
 }

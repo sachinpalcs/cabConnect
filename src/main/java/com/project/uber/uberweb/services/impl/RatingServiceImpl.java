@@ -17,6 +17,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -30,7 +34,7 @@ public class RatingServiceImpl implements RatingService {
 
 
     @Override
-    public DriverDto rateDriver(Ride ride, Integer rating) {
+    public DriverDto rateDriver(Ride ride, BigDecimal rating) {
         Driver driver = ride.getDriver();
         Rating ratingObj = ratingRepository.findByRide(ride)
                 .orElseThrow(() -> new ResourceNotFoundException("Rating not found for ride with id: " + ride.getId()));
@@ -39,21 +43,32 @@ public class RatingServiceImpl implements RatingService {
             throw new RuntimeConflictException("Driver has already been rated, cannot rate again");
 
         ratingObj.setDriverRating(rating);
-
         ratingRepository.save(ratingObj);
 
-        Double newRating = ratingRepository.findByDriver(driver)
+//        BigDecimal newRating = ratingRepository.findByDriver(driver)
+//                .stream()
+//                .mapToDouble(Rating::getDriverRating)
+//                .average().orElse(0.0);
+
+        List<BigDecimal> ratings = ratingRepository.findByDriver(driver)
                 .stream()
-                .mapToDouble(Rating::getDriverRating)
-                .average().orElse(0.0);
-        driver.setRating(BigDecimal.valueOf(newRating));
+                .map(Rating::getDriverRating)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        BigDecimal newRating = ratings.isEmpty() ? BigDecimal.ZERO :
+                ratings.stream()
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                        .divide(BigDecimal.valueOf(ratings.size()), 2, RoundingMode.HALF_UP);
+
+        driver.setRating(newRating);
 
         Driver savedDriver = driverRepository.save(driver);
         return modelMapper.map(savedDriver, DriverDto.class);
     }
 
     @Override
-    public RiderDto rateRider(Ride ride, Integer rating) {
+    public RiderDto rateRider(Ride ride, BigDecimal rating) {
         Rider rider = ride.getRider();
         Rating ratingObj = ratingRepository.findByRide(ride)
                 .orElseThrow(() -> new ResourceNotFoundException("Rating not found for ride with id: " + ride.getId()));
@@ -64,11 +79,24 @@ public class RatingServiceImpl implements RatingService {
 
         ratingRepository.save(ratingObj);
 
-        Double newRating = ratingRepository.findByRider(rider)
+//        BigDecimal newRating = ratingRepository.findByRider(rider)
+//                .stream()
+//                .mapToDouble(Rating::getRiderRating)
+//                .average().orElse(0.0);
+
+        List<BigDecimal> ratings = ratingRepository.findByRider(rider)
                 .stream()
-                .mapToDouble(Rating::getRiderRating)
-                .average().orElse(0.0);
-        rider.setRating(BigDecimal.valueOf(newRating));
+                .map(Rating::getRiderRating)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        BigDecimal newRating = ratings.isEmpty() ? BigDecimal.ZERO :
+                ratings.stream()
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                        .divide(BigDecimal.valueOf(ratings.size()), 2, RoundingMode.HALF_UP);
+
+
+        rider.setRating(newRating);
 
         Rider savedRider = riderRepository.save(rider);
         return modelMapper.map(savedRider, RiderDto.class);

@@ -25,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 import static com.project.uber.uberweb.entities.enums.Role.DRIVER;
@@ -88,10 +89,11 @@ public class AuthServiceImpl implements AuthService {
 
         Driver createDriver = Driver.builder()
                 .user(user)
-                .rating(0.0)
+                .rating(BigDecimal.ZERO)
                 .vehicleId(vehicleId)
                 .available(true)
                 .build();
+        user.getRoles().clear();
         user.getRoles().add(DRIVER);
         userRepository.save(user);
         Driver savedDriver = driverService.createNewDriver(createDriver);

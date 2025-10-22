@@ -10,9 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/drivers")
+@RequestMapping("/api/drivers")
 @Secured("ROLE_DRIVER")
 public class DriverController {
 
@@ -23,10 +25,10 @@ public class DriverController {
         return ResponseEntity.ok(driverService.acceptRide(rideRequestId));
     }
 
-    @PostMapping("/startRide/{rideRequestId}")
-    public ResponseEntity<RideDto> startRide(@PathVariable Long rideRequestId,
+    @PostMapping("/startRide/{rideId}")
+    public ResponseEntity<RideDto> startRide(@PathVariable Long rideId,
                                              @RequestBody RideStartDto rideStartDto) {
-        return ResponseEntity.ok(driverService.startRide(rideRequestId, rideStartDto.getOtp()));
+        return ResponseEntity.ok(driverService.startRide(rideId, rideStartDto.getOtp()));
     }
 
     @PostMapping("/endRide/{rideId}")
@@ -57,5 +59,19 @@ public class DriverController {
         return ResponseEntity.ok(driverService.getAllMyRides(pageRequest));
     }
 
+    @PatchMapping("/updateAvailability")
+    public ResponseEntity<DriverDto> updateAvailability(@RequestParam Boolean available) {
+        return ResponseEntity.ok(driverService.updateAvailability(available));
+    }
 
+    @PatchMapping("/updateLocation")
+    public ResponseEntity<DriverDto> updateLocation(@RequestBody DriverLocationDto locationDto) {
+        return ResponseEntity.ok(driverService.updateLocation(locationDto));
+    }
+
+    // --- THIS IS THE NEW ENDPOINT ---
+    @GetMapping("/pending-requests")
+    public ResponseEntity<List<RideRequestDto>> getPendingRequests() {
+        return ResponseEntity.ok(driverService.getPendingRequests());
+    }
 }

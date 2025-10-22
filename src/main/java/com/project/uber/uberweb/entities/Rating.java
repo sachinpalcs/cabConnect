@@ -3,6 +3,8 @@ package com.project.uber.uberweb.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(indexes = {
         @Index(name = "idx_rating_rider", columnList = "rider_id"),
@@ -28,6 +30,6 @@ public class Rating {
     @ManyToOne
     private Driver driver;
 
-    private Integer driverRating; //rating for the driver
-    private Integer riderRating; //rating for the rider
+    private BigDecimal driverRating; //rating for the driver
+    private BigDecimal riderRating; //rating for the rider
 }

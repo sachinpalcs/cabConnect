@@ -11,7 +11,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/riders")
+@RequestMapping("/api/riders")
 @RequiredArgsConstructor
 @Secured("ROLE_RIDER")
 public class RiderController {
@@ -28,9 +28,19 @@ public class RiderController {
         return ResponseEntity.ok(riderService.cancelRide(rideId));
     }
 
+    @PostMapping("/cancelRideRequest/{rideRequestId}")
+    public ResponseEntity<RideRequestDto> cancelRideRequest(@PathVariable Long rideRequestId) {
+        return ResponseEntity.ok(riderService.cancelRideRequest(rideRequestId));
+    }
+
     @PostMapping("/rateDriver")
     public ResponseEntity<DriverDto> rateDriver(@RequestBody RatingDto ratingDto) {
         return ResponseEntity.ok(riderService.rateDriver(ratingDto.getRideId(), ratingDto.getRating()));
+    }
+
+    @GetMapping("/getRideDetails/{rideId}")
+    public ResponseEntity<RideDto> getRideDetails(@PathVariable Long rideId) {
+        return ResponseEntity.ok(riderService.getRideDetails(rideId));
     }
 
 
@@ -46,5 +56,4 @@ public class RiderController {
                 Sort.by(Sort.Direction.DESC, "createdTime", "id"));
         return ResponseEntity.ok(riderService.getAllMyRides(pageRequest));
     }
-
 }

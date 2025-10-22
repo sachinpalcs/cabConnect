@@ -5,6 +5,7 @@ import lombok.*;
 import org.locationtech.jts.geom.Point;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 
 @Entity
@@ -28,7 +29,6 @@ public class Driver {
     private User user;
 
 
-    @Column(precision = 3, scale = 2)
     private BigDecimal rating;
 
     private Boolean available;
@@ -38,5 +38,7 @@ public class Driver {
     @Column(columnDefinition = "Geometry(Point, 4326)")
     private Point currentLocation;
 
-
+    // Add other necessary fields and relationships as needed
+    @ManyToMany(mappedBy = "potentialDrivers")
+    private List<RideRequest> rideRequests;
 }

@@ -16,12 +16,8 @@ import java.util.Arrays;
 
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
-
-// Add the line below to allow requests from your React app (remove this line in production)
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
-
 public class AuthController {
 
     private final AuthService authService;
@@ -45,7 +41,8 @@ public class AuthController {
                                            HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         String tokens[] = authService.login(loginRequestDto.getEmail(), loginRequestDto.getPassword());
 
-        Cookie cookie = new Cookie("token", tokens[1]);
+//        Cookie cookie = new Cookie("token", tokens[1]);
+        Cookie cookie = new Cookie("refreshToken", tokens[1]);
         cookie.setHttpOnly(true);
 
         httpServletResponse.addCookie(cookie);
@@ -64,6 +61,17 @@ public class AuthController {
         String accessToken = authService.refreshToken(refreshToken);
 
         return ResponseEntity.ok(new LoginResponseDto(accessToken));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletResponse httpServletResponse) {
+        Cookie cookie = new Cookie("refreshToken", null);
+        cookie.setMaxAge(0);
+        cookie.setHttpOnly(true);
+
+        httpServletResponse.addCookie(cookie);
+
+        return ResponseEntity.ok().build();
     }
 
 }

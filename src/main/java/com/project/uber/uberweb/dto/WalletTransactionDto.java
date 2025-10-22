@@ -6,6 +6,7 @@ import com.project.uber.uberweb.entities.enums.TransactionType;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -14,7 +15,7 @@ public class WalletTransactionDto {
 
     private Long id;
 
-    private Double amount;
+    private BigDecimal amount;
 
     private TransactionType transactionType;
 

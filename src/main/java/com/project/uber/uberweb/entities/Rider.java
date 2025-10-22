@@ -23,6 +23,5 @@ public class Rider {
     private User user;
 
 
-    @Column(precision = 3, scale = 2)
     private BigDecimal rating;
 }

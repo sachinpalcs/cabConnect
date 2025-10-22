@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -16,7 +17,7 @@ public class DistanceServiceOSRMImpl implements DistanceService {
     private static final String OSRM_API_BASE_URL = "https://router.project-osrm.org/route/v1/driving/";
 
     @Override
-    public double calculateDistance(Point src, Point dest) {
+    public BigDecimal calculateDistance(Point src, Point dest) {
 //Call the third party api called OSRM to fetch the distance
         try {
             String uri = src.getX() + "," + src.getY() + ";" + dest.getX() + "," + dest.getY();
@@ -28,7 +29,7 @@ public class DistanceServiceOSRMImpl implements DistanceService {
                     .retrieve()
                     .body(OSRMResponseDto.class);
 
-            return responseDto.getRoutes().get(0).getDistance() / 1000.0;
+            return responseDto.getRoutes().get(0).getDistance().divide(new BigDecimal("1000"));
         } catch (Exception e) {
             throw new RuntimeException("Error getting data from OSRM " + e.getMessage());
         }
@@ -42,5 +43,5 @@ class OSRMResponseDto {
 
 @Data
 class OSRMRoute {
-    private Double distance;
+    private BigDecimal distance;
 }
