@@ -36,6 +36,8 @@ public interface DriverService {
 
     DriverDto updateLocation(DriverLocationDto locationDto);
 
-    // ADD FOR OTHER NECESSARY METHODS
     List<RideRequestDto> getPendingRequests();
+
+//    add new method to get ride details
+    RideDto getRideDetails(Long rideId);
 }

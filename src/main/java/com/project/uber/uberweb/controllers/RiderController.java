@@ -56,4 +56,9 @@ public class RiderController {
                 Sort.by(Sort.Direction.DESC, "createdTime", "id"));
         return ResponseEntity.ok(riderService.getAllMyRides(pageRequest));
     }
+
+    @GetMapping("/getRideRequestDetails/{rideRequestId}")
+    public ResponseEntity<RideRequestDto> getRideRequestDetails(@PathVariable Long rideRequestId) {
+        return ResponseEntity.ok(riderService.getRideRequestDetails(rideRequestId));
+    }
 }

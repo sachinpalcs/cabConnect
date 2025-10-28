@@ -1,10 +1,7 @@
 package com.project.uber.uberweb.services.impl;
 
 import com.project.uber.uberweb.dto.*;
-import com.project.uber.uberweb.entities.Driver;
-import com.project.uber.uberweb.entities.Ride;
-import com.project.uber.uberweb.entities.RideRequest;
-import com.project.uber.uberweb.entities.User;
+import com.project.uber.uberweb.entities.*;
 import com.project.uber.uberweb.entities.enums.RideRequestStatues;
 import com.project.uber.uberweb.entities.enums.RideStatues;
 import com.project.uber.uberweb.exceptions.ResourceNotFoundException;
@@ -203,7 +200,6 @@ public class DriverServiceImpl implements DriverService {
     }
 
 
-    // Add other necessary methods as needed
     @Override
     public List<RideRequestDto> getPendingRequests() {
         Driver currentDriver = getCurrentDriver();
@@ -212,4 +208,17 @@ public class DriverServiceImpl implements DriverService {
                 .map(rideRequest -> modelMapper.map(rideRequest, RideRequestDto.class))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public RideDto getRideDetails(Long rideId) {
+        Driver driver = getCurrentDriver();
+        Ride ride = rideService.getRideById(rideId);
+
+        if (!driver.getId().equals(ride.getDriver().getId())) {
+            throw new RuntimeException("Driver is not the owner of this Ride");
+        }
+
+        return modelMapper.map(ride, RideDto.class);
+    }
+
 }

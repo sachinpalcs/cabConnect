@@ -165,4 +165,18 @@ public class RiderServiceImpl implements RiderService {
         ));
     }
 
+//    new method to rideRequests of rider
+    @Override
+    public RideRequestDto getRideRequestDetails(Long rideRequestId) {
+        Rider rider = getCurrentRider();
+        RideRequest rideRequest = rideRequestService.findRideRequestById(rideRequestId);
+
+        if (!rider.getId().equals(rideRequest.getRider().getId())) {
+            throw new RuntimeException("Rider is not the owner of this Ride Request");
+        }
+
+
+        return modelMapper.map(rideRequest, RideRequestDto.class);
+    }
+
 }

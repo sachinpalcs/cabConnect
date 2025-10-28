@@ -18,7 +18,7 @@ public interface RiderService {
 
     RideDto cancelRide(Long rideId);
 
-    // ADD FOR RIDE REQUEST CANCELLATION IF NEEDED
+
     RideRequestDto cancelRideRequest(Long rideRequestId);
 
 
@@ -34,4 +34,7 @@ public interface RiderService {
     Rider createNewRider(User user);
 
     Rider getCurrentRider();
+
+//    new method to rideRequests of rider
+    RideRequestDto getRideRequestDetails(Long rideRequestId);
 }

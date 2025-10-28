@@ -69,9 +69,13 @@ public class DriverController {
         return ResponseEntity.ok(driverService.updateLocation(locationDto));
     }
 
-    // --- THIS IS THE NEW ENDPOINT ---
     @GetMapping("/pending-requests")
     public ResponseEntity<List<RideRequestDto>> getPendingRequests() {
         return ResponseEntity.ok(driverService.getPendingRequests());
+    }
+// add new method getRideDetails
+    @GetMapping("/getRideDetails/{rideId}")
+    public ResponseEntity<RideDto> getRideDetails(@PathVariable Long rideId) {
+        return ResponseEntity.ok(driverService.getRideDetails(rideId));
     }
 }

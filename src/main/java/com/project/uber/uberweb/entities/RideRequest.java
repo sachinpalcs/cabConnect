@@ -46,7 +46,6 @@ public class RideRequest {
 
     private BigDecimal fare;
 
-    // ADD other necessary fields and relationships as needed
     @ManyToMany
     @JoinTable(
             name = "ride_request_potential_drivers",
